@@ -57,6 +57,7 @@ fn main() {
         .header("openssl/ssl.h")
         .header("openssl/err.h")
         .header("openssl/rand.h")
+        .header("openssl/rand_drbg.h")
         .header("openssl/pkcs12.h")
         .header("openssl/bn.h")
         .header("openssl/aes.h")

@@ -1030,3 +1030,5 @@ cfg_if! {
 }
 
 pub enum OCSP_RESPONSE {}
+
+pub enum RAND_DRBG {}
