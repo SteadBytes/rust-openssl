@@ -1,6 +1,9 @@
 use libc::*;
+
+#[cfg(ossl111)]
 use ossl_typ::RAND_DRBG;
 
+#[cfg(ossl111)]
 extern "C" {
     // Object liftetime functions
     pub fn RAND_DRBG_new(type_: c_int, flags: c_uint, parent: *mut RAND_DRBG) -> *mut RAND_DRBG;
@@ -11,6 +14,8 @@ extern "C" {
     ) -> c_int;
     pub fn RAND_DRBG_uninstantiate(drbg: *mut RAND_DRBG) -> c_int;
     pub fn RAND_DRBG_free(drbg: *mut RAND_DRBG);
+
+    pub fn RAND_DRBG_get0_master() -> *mut RAND_DRBG;
 
     // Object "use" functions
     pub fn RAND_DRBG_generate(
@@ -27,33 +32,34 @@ extern "C" {
     pub fn RAND_DRBG_set_reseed_interval(drbg: *mut RAND_DRBG, interval: c_uint) -> c_int;
     pub fn RAND_DRBG_set_reseed_time_interval(drbg: *mut RAND_DRBG, interval: time_t) -> c_int;
 
+    // TODO: Double check that all of these function pointers are nullable
     pub fn RAND_DRBG_set_callbacks(
         drbg: *mut RAND_DRBG,
-        get_entropy: unsafe extern "C" fn(
-            drbg: *mut RAND_DRBG,
-            pout: *mut *mut c_uchar,
-            entropy: c_int,
-            min_len: size_t,
-            max_len: size_t,
-            prediction_resistance: c_int,
-        ) -> size_t,
-        cleanup_entropy: unsafe extern "C" fn(
-            drbg: *mut RAND_DRBG,
-            out: *mut c_uchar,
-            outlen: size_t,
-        ),
-        get_nonce: unsafe extern "C" fn(
-            drbg: *mut RAND_DRBG,
-            pout: *mut *mut c_uchar,
-            entropy: c_int,
-            min_len: size_t,
-            max_len: size_t,
-        ) -> size_t,
-        cleanup_nonce: unsafe extern "C" fn(
-            drbg: *mut RAND_DRBG,
-            out: *mut c_uchar,
-            outlen: size_t,
-        ),
+        get_entropy: Option<
+            unsafe extern "C" fn(
+                drbg: *mut RAND_DRBG,
+                pout: *mut *mut c_uchar,
+                entropy: c_int,
+                min_len: size_t,
+                max_len: size_t,
+                prediction_resistance: c_int,
+            ) -> size_t,
+        >,
+        cleanup_entropy: Option<
+            unsafe extern "C" fn(drbg: *mut RAND_DRBG, out: *mut c_uchar, outlen: size_t),
+        >,
+        get_nonce: Option<
+            unsafe extern "C" fn(
+                drbg: *mut RAND_DRBG,
+                pout: *mut *mut c_uchar,
+                entropy: c_int,
+                min_len: size_t,
+                max_len: size_t,
+            ) -> size_t,
+        >,
+        cleanup_nonce: Option<
+            unsafe extern "C" fn(drbg: *mut RAND_DRBG, out: *mut c_uchar, outlen: size_t),
+        >,
     ) -> c_int;
 }
 

@@ -1031,4 +1031,5 @@ cfg_if! {
 
 pub enum OCSP_RESPONSE {}
 
+#[cfg(ossl111)]
 pub enum RAND_DRBG {}
